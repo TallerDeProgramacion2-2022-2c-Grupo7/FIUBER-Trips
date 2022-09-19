@@ -3,3 +3,4 @@ dist
 *.spec.ts
 *.mock.ts
 *.mocks.ts
+*/__tests__/*

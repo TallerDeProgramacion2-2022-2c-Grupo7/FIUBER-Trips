@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import { Request, Response, NextFunction } from 'express';
 import { initializeApp, applicationDefault } from 'firebase-admin/app';
 import { getAuth, UserRecord } from 'firebase-admin/auth';

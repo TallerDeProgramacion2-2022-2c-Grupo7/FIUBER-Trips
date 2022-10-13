@@ -8,6 +8,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - 
+        name: Create firebase adminsdk JSON
+        id: create-json
+        uses: jsdaniell/create-json@1.1.2
+        with:
+          name: "service-account-file.json"
+          json: ${{ secrets.SERVICE_ACCOUNT_FILE }}
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v2

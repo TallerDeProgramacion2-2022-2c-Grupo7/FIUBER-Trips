@@ -17,6 +17,30 @@ spec:
           env:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: service-account-file.json
+            - name: MONGO_HOST
+              value: mongodb
+            - name: MONGO_PORT
+              value: '27017'
+            - name: MONGO_DB
+              value: $APP_NAME
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+spec:
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+        - image: mongo:6.0.2
+          name: mongodb
 
 ---
 apiVersion: v1
@@ -30,6 +54,19 @@ spec:
       port: 8000
   selector:
     app: $APP_NAME
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+spec:
+  type: ClusterIP
+  ports:
+    - name: mongodb
+      port: 27017
+  selector:
+    app: mongodb
 
 ---
 apiVersion: networking.k8s.io/v1

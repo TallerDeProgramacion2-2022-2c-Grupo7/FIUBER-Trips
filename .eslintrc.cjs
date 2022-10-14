@@ -33,6 +33,9 @@ module.exports = {
     'no-empty-function': 'off',
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'error',
+    // note you must disable the base rule as it can report incorrect errors
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': ['error'],
   },
   env: {
     node: true,

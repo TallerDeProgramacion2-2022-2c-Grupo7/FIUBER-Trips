@@ -17,6 +17,14 @@ spec:
           env:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: service-account-file.json
+            - name: MONGO_HOST
+              value: mongodb
+            - name: MONGO_PORT
+              value: '27017'
+            - name: MONGO_DB
+              value: $APP_NAME
+        - image: mongo:6.0.2
+          name: mongodb
 
 ---
 apiVersion: v1

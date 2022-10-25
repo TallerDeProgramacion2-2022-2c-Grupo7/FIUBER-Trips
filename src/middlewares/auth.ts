@@ -30,6 +30,7 @@ const firebaseAuth = async (
     if (!authorization) {
       return res.status(401).json({ error: 'Not authorization token' });
     }
+    console.log(authorization);
     const token = await auth.verifyIdToken(authorization);
     req.user = await auth.getUser(token.uid);
     return next();

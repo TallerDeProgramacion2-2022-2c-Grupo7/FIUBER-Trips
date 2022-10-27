@@ -1,14 +1,22 @@
 /* eslint-disable import/no-unresolved */
 import { Request, Response, NextFunction } from 'express';
-import { initializeApp, applicationDefault } from 'firebase-admin/app';
+import { credential } from 'firebase-admin';
+import { initializeApp } from 'firebase-admin/app';
 import { getAuth, UserRecord } from 'firebase-admin/auth';
 
 export interface AuthenticatedRequest extends Request {
   user?: UserRecord;
 }
 
+const firebaseConfig = {
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  privateKey: process.env.FIREBASE_PRIVATE_KEY,
+  clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+};
+
 const firebaseApp = initializeApp({
-  credential: applicationDefault(),
+  projectId: firebaseConfig.projectId,
+  credential: credential.cert(firebaseConfig),
 });
 const auth = getAuth(firebaseApp);
 

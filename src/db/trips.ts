@@ -13,11 +13,19 @@ export interface ILatLng {
   longitude: number;
 }
 
+export interface IMapPoint {
+  cordigantes: ILatLng;
+  description: {
+    name: string;
+    formattedAddress: { mainText: string; secondaryText: string };
+  };
+}
+
 export interface ITrip {
-  userId: string;
+  passengerId: string;
   driverId?: string;
-  from: ILatLng;
-  to: ILatLng;
+  from: IMapPoint;
+  to: IMapPoint;
   cost: number;
   status: TripStatus;
   createdAt: Date;
@@ -31,11 +39,19 @@ const LatLongSchema = new Schema<ILatLng>(
   { _id: false }
 );
 
+const MapPointSchema = new Schema<IMapPoint>(
+  {
+    cordigantes: LatLongSchema,
+    description: Object,
+  },
+  { _id: false }
+);
+
 const TripSchema = new Schema<ITrip>({
-  userId: String,
+  passengerId: String,
   driverId: String,
-  from: LatLongSchema,
-  to: LatLongSchema,
+  from: MapPointSchema,
+  to: MapPointSchema,
   cost: Number,
   status: {
     type: String,

@@ -28,12 +28,10 @@ jobs:
           tags: aiacevedo/fiuber-trips:latest
       - name: Set APP_NAME
         run: sed -i "s/\$APP_NAME/$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')/g" ${{ github.event.repository.name }}/kubernetes.yml
-      - name: Set FIREBASE_SECRETS_PROJECT_ID
-        run: sed -i "s/\$FIREBASE_PROJECT_ID/$(echo ${{ secrets.FIREBASE_PROJECT_ID }} | tr '[:upper:]' '[:lower:]')/g" ${{ github.event.repository.name }}/firebase-secret.yml
-      - name: Set FIREBASE_SECRETS_PRIVATE_KEY
-        run: sed -i "s/\$FIREBASE_PRIVATE_KEY/$(echo ${{ secrets.FIREBASE_PRIVATE_KEY }} | tr '[:upper:]' '[:lower:]')/g" ${{ github.event.repository.name }}/firebase-secret.yml
-      - name: Set FIREBASE_SECRETS_CLIENT_EMAIL
-        run: sed -i "s/\$FIREBASE_CLIENT_EMAIL/$(echo ${{ secrets.FIREBASE_CLIENT_EMAIL }} | tr '[:upper:]' '[:lower:]')/g" ${{ github.event.repository.name }}/firebase-secret.yml
+      - name: Create firebase-secrets.yml
+        env:
+          FIREBASE_SECRETS_YML: ${{ secrets.FIREBASE_SECRETS_YML }}
+        run: echo "$FIREBASE_SECRETS_YML" > firebase-secrets.yml
       - name: Debug
         run: cat ${{ github.event.repository.name }}/kubernetes.yml
       - name: Delete secrets from okteto

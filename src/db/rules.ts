@@ -12,23 +12,28 @@ export interface IRulesWeights {
   tripDuration: number;
   tripLength: number;
   tripsInLastTimeWindow: number;
-  timeWindowSize: number;
 }
 
 export interface IRulesDiscounts {
   zone: number;
-  zoneCenter: ILatLng;
-  zoneRadius: number;
   time: number;
-  timeDays: string[];
-  timeHours: number[];
   paymentCredit: number;
   paymentDebit: number;
+}
+
+export interface IParameters {
+  timeWindowSize: number;
+  zoneCenter: ILatLng;
+  zoneRadius: number;
+  timeDays: string[];
+  timeHours: number[];
 }
 
 export interface IRules {
   weights: IRulesWeights;
   discounts: IRulesDiscounts;
+  parameters: IParameters;
+  datetime: Date;
 }
 
 const RulesWeightSchema = new Schema<IRulesWeights>(
@@ -43,7 +48,17 @@ const RulesWeightSchema = new Schema<IRulesWeights>(
     tripDuration: Number,
     tripLength: Number,
     tripsInLastTimeWindow: Number,
+  },
+  { _id: false }
+);
+
+const ParametersSchema = new Schema<IParameters>(
+  {
     timeWindowSize: Number,
+    zoneCenter: LatLongSchema,
+    zoneRadius: Number,
+    timeDays: Array,
+    timeHours: Array,
   },
   { _id: false }
 );
@@ -51,11 +66,7 @@ const RulesWeightSchema = new Schema<IRulesWeights>(
 const RulesDiscountSchema = new Schema<IRulesDiscounts>(
   {
     zone: Number,
-    zoneCenter: LatLongSchema,
-    zoneRadius: Number,
     time: Number,
-    timeDays: Array,
-    timeHours: Array,
     paymentCredit: Number,
     paymentDebit: Number,
   },
@@ -65,6 +76,8 @@ const RulesDiscountSchema = new Schema<IRulesDiscounts>(
 const RulesSchema = new Schema<IRules>({
   weights: RulesWeightSchema,
   discounts: RulesDiscountSchema,
+  parameters: ParametersSchema,
+  datetime: Date,
 });
 
 const Rules = model<IRules>('Rules', RulesSchema);

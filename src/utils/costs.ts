@@ -50,16 +50,16 @@ export const calculateCost = (trip: ITrip, rules: IRules) => {
   const availableDiscounts: number[] = [];
 
   const discountZoneValue = rules.discounts.zone;
-  const center = rules.discounts.zoneCenter;
-  const radius = rules.discounts.zoneRadius;
+  const center = rules.parameters.zoneCenter;
+  const radius = rules.parameters.zoneRadius;
   if (discountZoneValue > 0 && calculateDistance(trip.from, center) <= radius) {
     availableDiscounts.push(discountZoneValue);
   }
 
   const tripCreatedAt = trip.createdAt;
   const discountTimeValue = rules.discounts.time;
-  const days = rules.discounts.timeDays;
-  const hours = rules.discounts.timeHours;
+  const days = rules.parameters.timeDays;
+  const hours = rules.parameters.timeHours;
   if (datetimeMatches(tripCreatedAt, days, hours)) {
     availableDiscounts.push(discountTimeValue);
   }

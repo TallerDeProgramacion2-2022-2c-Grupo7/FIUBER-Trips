@@ -1,9 +1,13 @@
 /* eslint-disable import/prefer-default-export */
 import { Request, Response } from 'express';
 import { calculateCost } from '../utils/costs';
+import Rules from '../db/rules';
+import Trip from '../db/trips';
 
-export const calculate = (req: Request, res: Response) => {
+export const calculate = async (req: Request, res: Response) => {
   const { from, to } = req.body;
-  const cost = calculateCost(from, to);
+  const tripParams = new Trip({ from, to, createdAt: new Date() });
+  const rules = await Rules.findOne().sort({ _id: -1 });
+  const cost = calculateCost(tripParams, rules!);
   return res.status(200).json({ result: cost });
 };

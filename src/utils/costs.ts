@@ -21,7 +21,7 @@ const datetimeMatches = (
   const time = datetime.getHours();
   // eslint-disable-next-line no-restricted-syntax
   for (const d of days) {
-    if (day === dayMappings[d]) {
+    if (day === dayMappings[d.toLowerCase()]) {
       dayMatches = true;
     }
   }
@@ -42,6 +42,7 @@ export const calculateDistance = (from: ILatLng, to: ILatLng) => {
   return r * c * 1000;
 };
 
+// TODO: Mejorar esta función
 export const calculateCost = (trip: ITrip, rules: IRules) => {
   let price = 0;
   const distance = calculateDistance(trip.from, trip.to);
@@ -49,6 +50,7 @@ export const calculateCost = (trip: ITrip, rules: IRules) => {
 
   const availableDiscounts: number[] = [];
 
+  // Descuento por zona geográfica
   const discountZoneValue = rules.discounts.zone;
   const center = rules.parameters.zoneCenter;
   const radius = rules.parameters.zoneRadius;
@@ -56,6 +58,7 @@ export const calculateCost = (trip: ITrip, rules: IRules) => {
     availableDiscounts.push(discountZoneValue);
   }
 
+  // Descuento por día y hora de inicio de viaje
   const tripCreatedAt = trip.createdAt;
   const discountTimeValue = rules.discounts.time;
   const days = rules.parameters.timeDays;
@@ -64,7 +67,10 @@ export const calculateCost = (trip: ITrip, rules: IRules) => {
     availableDiscounts.push(discountTimeValue);
   }
 
-  const discountToApply = Math.max(...availableDiscounts);
+  const discountToApply =
+    availableDiscounts.length > 0 ? Math.max(...availableDiscounts) : 0;
+
+  price /= 1000;
   price -= price * (discountToApply / 100);
 
   return price;

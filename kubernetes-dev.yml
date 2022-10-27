@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: $APP_NAME
+  name: fiuber-trips-dev
 spec:
   selector:
     matchLabels:
-      app: $APP_NAME
+      app: fiuber-trips-dev
   template:
     metadata:
       labels:
-        app: $APP_NAME
+        app: fiuber-trips-dev
     spec:
       containers:
-        - image: aiacevedo/$APP_NAME
-          name: $APP_NAME
+        - image: aiacevedo/fiuber-trips-dev
+          name: fiuber-trips-dev
           env:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: service-account-file.json
@@ -22,10 +22,10 @@ spec:
             - name: MONGO_PORT
               value: '27017'
             - name: MONGO_DB
-              value: $APP_NAME
+              value: fiuber-trips-dev
           envFrom:
             - secretRef:
-                name: firebase-secrets
+                name: firebase-secrets-dev
 
 ---
 apiVersion: apps/v1
@@ -49,14 +49,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: $APP_NAME
+  name: fiuber-trips-dev
 spec:
   type: ClusterIP
   ports:
-    - name: $APP_NAME
+    - name: fiuber-trips-dev
       port: 8000
   selector:
-    app: $APP_NAME
+    app: fiuber-trips-dev
 
 ---
 apiVersion: v1
@@ -75,16 +75,16 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: $APP_NAME
+  name: fiuber-trips-dev
   annotations:
-    dev.okteto.com/generate-host: $APP_NAME
+    dev.okteto.com/generate-host: fiuber-trips-dev
 spec:
   rules:
     - http:
         paths:
           - backend:
               service:
-                name: $APP_NAME
+                name: fiuber-trips-dev
                 port:
                   number: 8000
             path: /

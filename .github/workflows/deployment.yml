@@ -12,10 +12,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: ${{ github.event.repository.name }}
-      - name: Create firebase adminsdk JSON
-        env:
-          SERVICE_ACCOUNT_FILE: ${{ secrets.SERVICE_ACCOUNT_FILE }}
-        run: echo "$SERVICE_ACCOUNT_FILE" > ${{ github.event.repository.name }}/service-account-file.json
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -28,13 +24,27 @@ jobs:
       - name: Build and push image to DockerHub
         uses: docker/build-push-action@v3
         with:
-          context: ./${{ github.event.repository.name }}
           push: true
           tags: aiacevedo/fiuber-trips:latest
       - name: Set APP_NAME
         run: sed -i "s/\$APP_NAME/$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')/g" ${{ github.event.repository.name }}/kubernetes.yml
+      - name: Create firebase-secrets.yml
+        env:
+          FIREBASE_SECRETS_YML: ${{ secrets.FIREBASE_SECRETS_YML }}
+        run: echo "$FIREBASE_SECRETS_YML" > ${{ github.event.repository.name }}/firebase-secrets.yml
       - name: Debug
         run: cat ${{ github.event.repository.name }}/kubernetes.yml
+      - name: Delete secrets from okteto
+        uses: steebchen/kubectl@v2.0.0
+        continue-on-error: true
+        with:
+          config: ${{ secrets.KUBE_CONFIG_DATA }}
+          command: delete -f ${{ github.event.repository.name }}/firebase-secrets.yml
+      - name: Apply secrets to okteto
+        uses: steebchen/kubectl@v2.0.0
+        with:
+          config: ${{ secrets.KUBE_CONFIG_DATA }}
+          command: apply -f ${{ github.event.repository.name }}/firebase-secrets.yml
       - name: Delete deployment from okteto
         uses: steebchen/kubectl@v2.0.0
         continue-on-error: true

@@ -104,3 +104,7 @@ dist
 .tern-port
 
 google-services.json
+
+firebase-secrets-dev.yml
+
+firebase-secrets.yml

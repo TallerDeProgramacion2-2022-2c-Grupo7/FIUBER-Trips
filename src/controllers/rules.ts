@@ -34,7 +34,13 @@ export const getRulesById = async (
 };
 
 export const updateRules = async (req: AuthenticatedRequest, res: Response) => {
-  const rulesRecord = new Rules({ ...req.body, datetime: new Date() });
+  const { weights, discounts, parameters } = req.body;
+  const rulesRecord = new Rules({
+    weights,
+    discounts,
+    parameters,
+    datetime: new Date(),
+  });
   await rulesRecord.save();
   res.status(201).json({ result: rulesRecord.toJSON() });
 };

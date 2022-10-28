@@ -12,7 +12,7 @@ spec:
         app: $APP_NAME
     spec:
       containers:
-        - image: $DOCKERHUB_USERNAME/$APP_NAME
+        - image: aiacevedo/$APP_NAME
           name: $APP_NAME
           env:
             - name: GOOGLE_APPLICATION_CREDENTIALS

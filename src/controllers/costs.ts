@@ -1,9 +1,13 @@
 /* eslint-disable import/prefer-default-export */
 import { Request, Response } from 'express';
 import { calculateCost } from '../utils/costs';
+import Rules from '../db/rules';
+import Trip from '../db/trips';
 
-export const calculate = (req: Request, res: Response) => {
-  const { from, to } = req.body;
-  const cost = calculateCost(from, to);
+export const calculate = async (req: Request, res: Response) => {
+  const { rulesParams, tripParams } = req.body;
+  const trip = new Trip({ ...tripParams, createdAt: new Date() });
+  const rules = new Rules(rulesParams);
+  const cost = calculateCost(trip, rules);
   return res.status(200).json({ result: cost });
 };

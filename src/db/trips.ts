@@ -31,7 +31,7 @@ export interface ITrip {
   createdAt: Date;
 }
 
-const LatLongSchema = new Schema<ILatLng>(
+export const LatLongSchema = new Schema<ILatLng>(
   {
     latitude: Number,
     longitude: Number,

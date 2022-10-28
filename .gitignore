@@ -108,3 +108,4 @@ google-services.json
 firebase-secrets-dev.yml
 
 firebase-secrets.yml
+service-account-file.json

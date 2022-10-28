@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { ENDPOINT_ERRORS } from '../constants/errors';
 import Trip, { TripStatus } from '../db/trips';
+import Rules from '../db/rules';
 import { AuthenticatedRequest } from '../middlewares/auth';
 import { calculateCost } from '../utils/costs';
 import {
@@ -28,8 +29,10 @@ export const newTrip = async (req: AuthenticatedRequest, res: Response) => {
     userId: user?.uid,
     createdAt: new Date(),
     status: TripStatus.SERCHING_DRIVER,
-    cost: calculateCost(bodyData.from, bodyData.to),
+    cost: -1, // calculateCost(bodyData.from, bodyData.to),
   };
+  const rules = await Rules.findOne().sort({ _id: -1 });
+  trip.cost = calculateCost(trip, rules!);
   const tripRecord = new Trip(trip);
   await tripRecord.save();
   res.status(201).json({ result: tripRecord.toJSON() });

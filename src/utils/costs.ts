@@ -45,7 +45,10 @@ export const calculateDistance = (from: ILatLng, to: ILatLng) => {
 // TODO: Mejorar esta función
 export const calculateCost = (trip: ITrip, rules: IRules) => {
   let price = 0;
-  const distance = calculateDistance(trip.from, trip.to);
+  const distance = calculateDistance(
+    trip.from.coordinates,
+    trip.to.coordinates
+  );
   price += rules.weights.tripLength * distance;
 
   const availableDiscounts: number[] = [];
@@ -54,7 +57,10 @@ export const calculateCost = (trip: ITrip, rules: IRules) => {
   const discountZoneValue = rules.discounts.zone;
   const center = rules.parameters.zoneCenter;
   const radius = rules.parameters.zoneRadius;
-  if (discountZoneValue > 0 && calculateDistance(trip.from, center) <= radius) {
+  if (
+    discountZoneValue > 0 &&
+    calculateDistance(trip.from.coordinates, center) <= radius
+  ) {
     availableDiscounts.push(discountZoneValue);
   }
 

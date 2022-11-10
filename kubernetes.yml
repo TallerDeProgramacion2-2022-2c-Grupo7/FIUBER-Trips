@@ -23,6 +23,8 @@ spec:
               value: '27017'
             - name: MONGO_DB
               value: $APP_NAME
+            - name: NODE_ENV
+              value: production
           envFrom:
             - secretRef:
                 name: firebase-secrets

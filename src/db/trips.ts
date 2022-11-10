@@ -14,7 +14,7 @@ export interface ILatLng {
 }
 
 export interface IMapPoint {
-  cordigantes: ILatLng;
+  coordinates: ILatLng;
   description: {
     name: string;
     formattedAddress: { mainText: string; secondaryText: string };
@@ -41,7 +41,7 @@ const LatLongSchema = new Schema<ILatLng>(
 
 const MapPointSchema = new Schema<IMapPoint>(
   {
-    cordigantes: LatLongSchema,
+    coordinates: LatLongSchema,
     description: Object,
   },
   { _id: false }

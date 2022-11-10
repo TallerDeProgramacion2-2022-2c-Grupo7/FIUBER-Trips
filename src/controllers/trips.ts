@@ -25,10 +25,10 @@ export const newTrip = async (req: AuthenticatedRequest, res: Response) => {
   const { user } = req;
   const trip = {
     ...bodyData,
-    userId: user?.uid,
+    passengerId: user?.uid,
     createdAt: new Date(),
     status: TripStatus.SERCHING_DRIVER,
-    cost: calculateCost(bodyData.from, bodyData.to),
+    cost: calculateCost(bodyData.from.coordinates, bodyData.to.coordinates),
   };
   const tripRecord = new Trip(trip);
   await tripRecord.save();

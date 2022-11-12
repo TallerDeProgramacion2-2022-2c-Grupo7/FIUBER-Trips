@@ -26,14 +26,13 @@ export const newTrip = async (req: AuthenticatedRequest, res: Response) => {
   const { user } = req;
   const trip = {
     ...bodyData,
-    userId: user?.uid,
+    passengerId: user?.uid,
     createdAt: new Date(),
     status: TripStatus.SERCHING_DRIVER,
-    cost: -1, // calculateCost(bodyData.from, bodyData.to),
   };
   const rules = await Rules.findOne().sort({ _id: -1 });
-  trip.cost = calculateCost(trip, rules!);
-  const tripRecord = new Trip(trip);
+  const cost = calculateCost(trip, rules!);
+  const tripRecord = new Trip({ ...trip, cost });
   await tripRecord.save();
   res.status(201).json({ result: tripRecord.toJSON() });
 };

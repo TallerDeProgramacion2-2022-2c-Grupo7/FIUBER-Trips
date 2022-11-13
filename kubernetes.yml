@@ -17,12 +17,14 @@ spec:
           env:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: service-account-file.json
-            - name: MONGO_HOST
+            - name: DB_HOST
               value: mongodb
-            - name: MONGO_PORT
+            - name: DB_PORT
               value: '27017'
-            - name: MONGO_DB
+            - name: DB_DATABASE
               value: $APP_NAME
+            - name: NODE_ENV
+              value: production
           envFrom:
             - secretRef:
                 name: firebase-secrets

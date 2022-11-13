@@ -1,8 +1,9 @@
 import { connect } from 'mongoose';
+import config from '../config';
 
-const host = process.env.MONGO_HOST || 'localhost';
-const port = process.env.MONGO_PORT || 27017;
-const database = process.env.MONGO_DATABASE || 'test';
+const host = config.db.host || 'localhost';
+const port = config.db.port || 27017;
+const database = config.db.database || 'test';
 
 class Database {
   private static DB_URL = `mongodb://${host}:${port}/${database}`;

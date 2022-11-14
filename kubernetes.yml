@@ -15,10 +15,8 @@ spec:
         - image: aiacevedo/$APP_NAME
           name: $APP_NAME
           env:
-            - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: service-account-file.json
             - name: DB_HOST
-              value: mongodb
+              value: $APP_NAME-mongodb
             - name: DB_PORT
               value: '27017'
             - name: DB_DATABASE
@@ -33,19 +31,38 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongodb
+  name: $APP_NAME-mongodb
 spec:
   selector:
     matchLabels:
-      app: mongodb
+      app: $APP_NAME-mongodb
   template:
     metadata:
       labels:
-        app: mongodb
+        app: $APP_NAME-mongodb
     spec:
       containers:
         - image: mongo:6.0.2
           name: mongodb
+        - volumeMounts:
+            - name: $APP_NAME-db-volume
+              mountPath: /data/db
+    volumes:
+      - name: $APP_NAME-db-volume
+        persistentVolumeClaim:
+          claimName: $APP_NAME-mongodb-claim
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: $APP_NAME-mongodb-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
 
 ---
 apiVersion: v1
@@ -64,14 +81,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongodb
+  name: $APP_NAME-mongodb
 spec:
   type: ClusterIP
   ports:
-    - name: mongodb
+    - name: $APP_NAME-mongodb
       port: 27017
   selector:
-    app: mongodb
+    app: $APP_NAME-mongodb
 
 ---
 apiVersion: networking.k8s.io/v1

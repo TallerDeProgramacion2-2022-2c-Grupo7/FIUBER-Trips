@@ -5,9 +5,9 @@ import Rules from '../db/rules';
 import Trip from '../db/trips';
 
 export const calculate = async (req: Request, res: Response) => {
-  const { rulesParams, tripParams } = req.body;
+  const { tripParams } = req.body;
   const trip = new Trip({ ...tripParams, createdAt: new Date() });
-  const rules = new Rules(rulesParams);
-  const cost = calculateCost(trip, rules);
+  const rules = await Rules.findOne().sort({ _id: -1 });
+  const cost = calculateCost(trip, rules!);
   return res.status(200).json({ result: cost });
 };

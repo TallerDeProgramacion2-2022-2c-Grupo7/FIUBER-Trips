@@ -109,3 +109,5 @@ firebase-secrets-dev.yml
 
 firebase-secrets.yml
 service-account-file.json
+
+.DS_Store

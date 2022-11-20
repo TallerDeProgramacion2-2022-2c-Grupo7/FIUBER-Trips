@@ -21,6 +21,14 @@ export const getTrip = async (req: Request, res: Response) => {
   res.status(200).json({ result: trip?.toJSON() });
 };
 
+export const getMetricsForUser = async (req: Request, res: Response) => {
+  const { uid } = req.query;
+  const tripsAsPassenger = await Trip.find({ passengerId: uid }).count();
+  const tripsAsDriver = await Trip.find({ driverId: uid }).count();
+  // TODO: Agregar viajes cancelados.
+  res.status(200).json({ result: { tripsAsPassenger, tripsAsDriver } });
+};
+
 export const newTrip = async (req: AuthenticatedRequest, res: Response) => {
   const bodyData = req.body;
   const { user } = req;

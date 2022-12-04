@@ -13,7 +13,7 @@ const datadogEvent = async (
     return next();
   }
   res.on('finish', function() {
-    const dogstatsd = new StatsD();
+    const dogstatsd = new StatsD({ host: 'dd-agent', port: 8125 });
     dogstatsd.event(`${req.method} ${req.url} ${this.statusCode}`, '', {
       alert_type: this.statusCode >= 500 ? 'error' : 'info',
     });

@@ -14,7 +14,7 @@ const datadogEvent = async (
   }
   res.on('finish', function() {
     try {
-      const dogstatsd = new StatsD({ host: '127.0.0.1', port: 8125 });
+      const dogstatsd = new StatsD({ host: 'dd-agent', port: 8125 });
       dogstatsd.event(
         `${req.method} ${req.baseUrl}${req.url} ${this.statusCode}`,
         '',

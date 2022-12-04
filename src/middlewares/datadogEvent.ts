@@ -2,16 +2,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { StatsD } from 'hot-shots';
 
-// import config from '../config';
+import config from '../config';
 
 const datadogEvent = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  // if (config.enviroment === 'development') {
-  //   return next();
-  // }
+  if (config.enviroment === 'development') {
+    return next();
+  }
   res.on('finish', function() {
     try {
       const dogstatsd = new StatsD({ host: '127.0.0.1', port: 8125 });

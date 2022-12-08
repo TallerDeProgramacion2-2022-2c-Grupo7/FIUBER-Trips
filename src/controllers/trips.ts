@@ -4,6 +4,7 @@ import Trip, { TripStatus } from '../db/trips';
 import Rules from '../db/rules';
 import { AuthenticatedRequest } from '../middlewares/auth';
 import { calculateCost } from '../utils/costs';
+import * as admin from 'firebase-admin';
 import {
   checkForAcceptStatus,
   checkForFinishStatus,
@@ -25,7 +26,6 @@ export const getMetricsForUser = async (req: Request, res: Response) => {
   const { uid } = req.query;
   const tripsAsPassenger = await Trip.find({ passengerId: uid }).count();
   const tripsAsDriver = await Trip.find({ driverId: uid }).count();
-  // TODO: Agregar viajes cancelados.
   res.status(200).json({ result: { tripsAsPassenger, tripsAsDriver } });
 };
 
@@ -42,6 +42,26 @@ export const newTrip = async (req: AuthenticatedRequest, res: Response) => {
   const cost = calculateCost(trip, rules!);
   const tripRecord = new Trip({ ...trip, cost });
   await tripRecord.save();
+
+  const message = {
+    notification: {
+      title: 'New trip available',
+      body: 'You have an available trip'
+    },
+    topic: 'availableTrips',
+  };
+
+  try{
+    await admin.messaging().send(message)
+    .then((response) => {
+      console.log('Successfully sent message:', response);
+    })
+  }
+  catch(error) {
+    console.log('Error sending new trip message:', error);
+  };
+
+
   res.status(201).json({ result: tripRecord.toJSON() });
 };
 
@@ -49,6 +69,7 @@ export const getAvailableTrip = async (
   _req: AuthenticatedRequest,
   res: Response
 ) => {
+
   const trip = await Trip.findOneAndUpdate(
     {
       status: { $eq: TripStatus.SERCHING_DRIVER },
@@ -59,6 +80,7 @@ export const getAvailableTrip = async (
   if (!trip) {
     return res.status(200).json({ result: null });
   }
+
   return res.status(200).json({ result: trip.toJSON() });
 };
 
@@ -81,6 +103,25 @@ export const acceptTrip = async (req: AuthenticatedRequest, res: Response) => {
     },
     { new: true }
   );
+
+  const message = {
+    notification: {
+      title: 'Driver found',
+      body: 'A driver was found for your trip'
+    },
+    token: updatedTrip!.passengerDeviceId,
+  };
+
+  try{
+    await admin.messaging().send(message)
+  .then((response) => {
+    console.log('Successfully sent message:', response);
+  })
+  }
+  catch(error) {
+    console.log('Error sending driver found message:', error);
+  };
+
   return res.status(200).json({ result: updatedTrip!.toJSON() });
 };
 

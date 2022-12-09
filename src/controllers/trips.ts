@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
+import * as admin from 'firebase-admin';
 import { ENDPOINT_ERRORS } from '../constants/errors';
 import Trip, { TripStatus } from '../db/trips';
 import Rules from '../db/rules';
 import { AuthenticatedRequest } from '../middlewares/auth';
 import { calculateCost } from '../utils/costs';
-import * as admin from 'firebase-admin';
 import {
   checkForAcceptStatus,
   checkForFinishStatus,
@@ -46,21 +46,21 @@ export const newTrip = async (req: AuthenticatedRequest, res: Response) => {
   const message = {
     notification: {
       title: 'New trip available',
-      body: 'You have an available trip'
+      body: 'You have an available trip',
     },
     topic: 'availableTrips',
   };
 
-  try{
-    await admin.messaging().send(message)
-    .then((response) => {
-      console.log('Successfully sent message:', response);
-    })
-  }
-  catch(error) {
+  try {
+    await admin
+      .messaging()
+      .send(message)
+      .then(response => {
+        console.log('Successfully sent message:', response);
+      });
+  } catch (error) {
     console.log('Error sending new trip message:', error);
-  };
-
+  }
 
   res.status(201).json({ result: tripRecord.toJSON() });
 };
@@ -69,7 +69,6 @@ export const getAvailableTrip = async (
   _req: AuthenticatedRequest,
   res: Response
 ) => {
-
   const trip = await Trip.findOneAndUpdate(
     {
       status: { $eq: TripStatus.SERCHING_DRIVER },
@@ -107,20 +106,21 @@ export const acceptTrip = async (req: AuthenticatedRequest, res: Response) => {
   const message = {
     notification: {
       title: 'Driver found',
-      body: 'A driver was found for your trip'
+      body: 'A driver was found for your trip',
     },
     token: updatedTrip!.passengerDeviceId,
   };
 
-  try{
-    await admin.messaging().send(message)
-  .then((response) => {
-    console.log('Successfully sent message:', response);
-  })
+  try {
+    await admin
+      .messaging()
+      .send(message)
+      .then(response => {
+        console.log('Successfully sent message:', response);
+      });
+  } catch (errorSending) {
+    console.log('Error sending driver found message:', errorSending);
   }
-  catch(error) {
-    console.log('Error sending driver found message:', error);
-  };
 
   return res.status(200).json({ result: updatedTrip!.toJSON() });
 };

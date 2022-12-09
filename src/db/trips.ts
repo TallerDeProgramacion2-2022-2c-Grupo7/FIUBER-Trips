@@ -23,6 +23,7 @@ export interface IMapPoint {
 
 export interface ITrip {
   passengerId: string;
+  passengerDeviceId: string;
   driverId?: string;
   from: IMapPoint;
   to: IMapPoint;
@@ -49,6 +50,7 @@ const MapPointSchema = new Schema<IMapPoint>(
 
 const TripSchema = new Schema<ITrip>({
   passengerId: String,
+  passengerDeviceId: String,
   driverId: String,
   from: MapPointSchema,
   to: MapPointSchema,

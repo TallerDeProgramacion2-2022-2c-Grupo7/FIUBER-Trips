@@ -8,8 +8,8 @@ import rulesRouter from './rules';
 
 const apiRouter = Router();
 
-apiRouter.use('/trips', firebaseAuth, tripRouter);
-apiRouter.use('/costs', firebaseAuth, costRouter);
+apiRouter.use('/trips', datadogEvent, firebaseAuth, tripRouter);
+apiRouter.use('/costs', datadogEvent, firebaseAuth, costRouter);
 apiRouter.use('/rules', datadogEvent, firebaseAuth, rulesRouter);
 
 export default apiRouter;

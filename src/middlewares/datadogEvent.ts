@@ -23,8 +23,9 @@ const datadogEvent = async (
         },
         ['app_name:fiuber-trips']
       );
-      // eslint-disable-next-line no-empty
-    } catch {}
+    } catch (error) {
+      console.log(error);
+    }
   });
   return next();
 };

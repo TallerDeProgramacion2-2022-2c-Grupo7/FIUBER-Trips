@@ -27,7 +27,7 @@ jobs:
           push: true
           tags: aiacevedo/fiuber-trips:latest
       - name: Set APP_NAME
-        run: sed -i "s/\$APP_NAME/$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')/g" ${{ github.event.repository.name }}/kubernetes.yml
+        run: sed -i "s/\$APP_NAME/$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')/g" ${{ github.event.repository.name }}/kubernetes.yml && sed -i "s/\$DD_API_KEY/${{ secrets.DD_API_KEY }}/g" ./kubernetes.yml
       - name: Create firebase-secrets.yml
         env:
           FIREBASE_SECRETS_YML: ${{ secrets.FIREBASE_SECRETS_YML }}

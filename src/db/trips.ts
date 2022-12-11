@@ -29,6 +29,7 @@ export interface ITrip {
   to: IMapPoint;
   cost: number;
   status: TripStatus;
+  paymentHash?: string;
   createdAt: Date;
 }
 
@@ -59,6 +60,7 @@ const TripSchema = new Schema<ITrip>({
     type: String,
     enum: Object.values(TripStatus),
   },
+  paymentHash: String,
   createdAt: Date,
 });
 

@@ -1,5 +1,6 @@
 import { Schema, model } from 'mongoose';
-import { ILatLng, LatLongSchema } from './trips';
+import { ILatLng } from '../interfaces/trip';
+import { LatLongSchema } from './trips';
 
 export interface IRulesWeights {
   driverTripsOfDay: number;

@@ -1,4 +1,4 @@
-import { ITrip, ILatLng } from '../db/trips';
+import { ITrip, ILatLng } from '../interfaces/trip';
 import { IRules } from '../db/rules';
 
 const datetimeMatches = (

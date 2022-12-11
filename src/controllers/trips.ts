@@ -10,6 +10,7 @@ import {
   checkForFinishStatus,
   checkForStartStatus,
 } from '../utils/next-status';
+import { executePayment } from '../services/wallet';
 
 export const getTrips = async (_req: Request, res: Response) => {
   const trips = await Trip.find().limit(10);
@@ -175,10 +176,16 @@ export const finishTrip = async (req: AuthenticatedRequest, res: Response) => {
   if (error) {
     return res.status(400).json({ error });
   }
+  const tx = await executePayment(trip.passengerId, trip.driverId, trip.cost);
+  if (!tx) {
+    return res.status(500).json({ error: ENDPOINT_ERRORS.paymentError });
+  }
+
   const updatedTrip = await Trip.findByIdAndUpdate(
     trip.id,
     {
       status: TripStatus.FINISHED,
+      paymentHash: tx.hash,
     },
     { new: true }
   );

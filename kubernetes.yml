@@ -23,6 +23,8 @@ spec:
               value: $APP_NAME
             - name: NODE_ENV
               value: production
+            - name: FIREBASE_API_KEY
+              value: $FIREBASE_API_KEY
           envFrom:
             - secretRef:
                 name: firebase-secrets
@@ -91,7 +93,6 @@ spec:
     app: $APP_NAME-mongodb
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -106,18 +107,17 @@ spec:
         app: dd-agent
     spec:
       containers:
-      - image: datadog/agent
-        name: dd-agent
-        env:
-        - name: DD_SITE
-          value: "datadoghq.com"
-        - name: DD_API_KEY
-          value: "$DD_API_KEY"
-        - name: DD_DOGSTATSD_NON_LOCAL_TRAFFIC
-          value: "true"
+        - image: datadog/agent
+          name: dd-agent
+          env:
+            - name: DD_SITE
+              value: 'datadoghq.com'
+            - name: DD_API_KEY
+              value: '$DD_API_KEY'
+            - name: DD_DOGSTATSD_NON_LOCAL_TRAFFIC
+              value: 'true'
 
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -125,9 +125,9 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - name: dd-agent
-    port: 8125
-    protocol: UDP
+    - name: dd-agent
+      port: 8125
+      protocol: UDP
   selector:
     app: dd-agent
 

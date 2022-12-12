@@ -147,6 +147,25 @@ export const finishTripAndUpdate = async (tripId: string, driverId: string) => {
   return updatedTrip;
 };
 
+export const updatePaymentHash = async (
+  tripId: string,
+  paymentHash: string
+) => {
+  const updatedTrip = await Trip.findByIdAndUpdate(
+    tripId,
+    {
+      paymentHash,
+    },
+    { new: true }
+  );
+
+  if (!updatedTrip || updatedTrip === null) {
+    throw new Error(ENDPOINT_ERRORS.tripNotFound);
+  }
+
+  return updatedTrip;
+};
+
 export const cancelTripAndUpdate = async (
   tripId: string,
   passangerId: string

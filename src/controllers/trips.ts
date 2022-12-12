@@ -9,6 +9,7 @@ import Trip, {
   getUnfinishedTrip,
   rejectTripAndUpdate,
   startTripAndUpdate,
+  updatePaymentHash,
 } from '../db/trips';
 import { TripStatus } from '../interfaces/trip';
 import Rules from '../db/rules';
@@ -128,7 +129,9 @@ export const finishTrip = async (req: AuthenticatedRequest, res: Response) => {
       return res.status(500).json({ error: ENDPOINT_ERRORS.paymentError });
     }
 
-    return res.status(200).json({ result: updatedTrip.toJSON() });
+    const tripWithPayment = await updatePaymentHash(tripId, tx.hash);
+
+    return res.status(200).json({ result: tripWithPayment.toJSON() });
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }

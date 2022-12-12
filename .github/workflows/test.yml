@@ -19,9 +19,7 @@ jobs:
         run: yarn lint
 
       - name: Run tests
-        run:  yarn test --coverage --json --outputFile coverage.json
+        run:  yarn test --coverage -
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with: 
-            files: coverage.json
+        uses: codecov/codecov-action@v2

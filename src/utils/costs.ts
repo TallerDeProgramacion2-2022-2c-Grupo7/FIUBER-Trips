@@ -1,7 +1,7 @@
 import { ITrip, ILatLng } from '../interfaces/trip';
 import { IRules } from '../db/rules';
 
-const AVERAGE_DRIVING_SPEED = 13.89; // en m/s
+const AVERAGE_DRIVING_SPEED = 11.11; // en m/s
 
 const datetimeMatches = (
   datetime: Date,
@@ -49,7 +49,8 @@ export const calculateDuration = (trip: ITrip) => {
     trip.from.coordinates,
     trip.to.coordinates
   );
-  return distance / AVERAGE_DRIVING_SPEED;
+  // eslint-disable-next-line prettier/prettier
+  return Math.floor((distance / AVERAGE_DRIVING_SPEED) / 60);
 };
 
 export const calculateCost = (trip: ITrip, rules: IRules) => {

@@ -27,6 +27,7 @@ export interface ITrip {
   from: IMapPoint;
   to: IMapPoint;
   cost: number;
+  duration: number;
   status: TripStatus;
   paymentHash?: string;
   canceledDriver: string[];

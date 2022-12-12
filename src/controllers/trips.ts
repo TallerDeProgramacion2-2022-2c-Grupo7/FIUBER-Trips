@@ -13,7 +13,7 @@ import Trip, {
 import { TripStatus } from '../interfaces/trip';
 import Rules from '../db/rules';
 import { AuthenticatedRequest } from '../middlewares/auth';
-import { calculateCost } from '../utils/costs';
+import { calculateCost, calculateDuration } from '../utils/costs';
 import { executePayment } from '../services/wallet';
 import {
   sendNewTripNotification,
@@ -51,7 +51,8 @@ export const newTrip = async (req: AuthenticatedRequest, res: Response) => {
 
   const rules = await Rules.findOne().sort({ _id: -1 });
   const cost = calculateCost(trip, rules!);
-  const tripRecord = await createAndSaveTrip({ ...trip, cost });
+  const duration = calculateDuration(trip);
+  const tripRecord = await createAndSaveTrip({ ...trip, cost, duration });
 
   await sendNewTripNotification();
 

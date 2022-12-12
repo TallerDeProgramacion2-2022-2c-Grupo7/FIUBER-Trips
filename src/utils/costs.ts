@@ -1,6 +1,8 @@
 import { ITrip, ILatLng } from '../interfaces/trip';
 import { IRules } from '../db/rules';
 
+const AVERAGE_DRIVING_SPEED = 13.89; // en m/s
+
 const datetimeMatches = (
   datetime: Date,
   days: Array<string>,
@@ -42,7 +44,14 @@ export const calculateDistance = (from: ILatLng, to: ILatLng) => {
   return r * c * 1000;
 };
 
-// TODO: Mejorar esta función
+export const calculateDuration = (trip: ITrip) => {
+  const distance = calculateDistance(
+    trip.from.coordinates,
+    trip.to.coordinates
+  );
+  return distance / AVERAGE_DRIVING_SPEED;
+};
+
 export const calculateCost = (trip: ITrip, rules: IRules) => {
   let price = 0;
   const distance = calculateDistance(

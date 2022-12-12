@@ -26,8 +26,8 @@ jobs:
         with:
           push: true
           tags: aiacevedo/fiuber-trips:latest
-      - name: Set APP_NAME
-        run: |
+      - name: Configure kubernetes.yml
+        run: >
           sed -i "s/\$APP_NAME/$(echo ${{ github.event.repository.name }} | tr '[:upper:]' '[:lower:]')/g" ${{ github.event.repository.name }}/kubernetes.yml
           && sed -i "s/\$DD_API_KEY/${{ secrets.DD_API_KEY }}/g" ${{ github.event.repository.name }}/kubernetes.yml
           && sed -i "s/\$FIREBASE_API_KEY/${{ secrets.FIREBASE_API_KEY }}/g" ${{ github.event.repository.name }}/kubernetes.yml

@@ -1,16 +1,25 @@
 import { Request, Response } from 'express';
-import * as admin from 'firebase-admin';
 import { ENDPOINT_ERRORS } from '../constants/errors';
-import Trip, { TripStatus } from '../db/trips';
+import Trip, {
+  acceptTripAndUpdate,
+  cancelTripAndUpdate,
+  createAndSaveTrip,
+  finishTripAndUpdate,
+  getOneAvailableTrip,
+  getUnfinishedTrip,
+  rejectTripAndUpdate,
+  startTripAndUpdate,
+  updatePaymentHash,
+} from '../db/trips';
+import { TripStatus } from '../interfaces/trip';
 import Rules from '../db/rules';
 import { AuthenticatedRequest } from '../middlewares/auth';
 import { calculateCost } from '../utils/costs';
-import {
-  checkForAcceptStatus,
-  checkForFinishStatus,
-  checkForStartStatus,
-} from '../utils/next-status';
 import { executePayment } from '../services/wallet';
+import {
+  sendNewTripNotification,
+  sendTripAcceptedNotification,
+} from '../services/notification';
 
 export const getTrips = async (_req: Request, res: Response) => {
   const trips = await Trip.find().limit(10);
@@ -38,45 +47,25 @@ export const newTrip = async (req: AuthenticatedRequest, res: Response) => {
     passengerId: user?.uid,
     createdAt: new Date(),
     status: TripStatus.SERCHING_DRIVER,
+    canceledDriver: [],
   };
+
   const rules = await Rules.findOne().sort({ _id: -1 });
   const cost = calculateCost(trip, rules!);
-  const tripRecord = new Trip({ ...trip, cost });
-  await tripRecord.save();
+  const tripRecord = await createAndSaveTrip({ ...trip, cost });
 
-  const message = {
-    notification: {
-      title: 'New trip available',
-      body: 'You have an available trip',
-    },
-    topic: 'availableTrips',
-  };
-
-  try {
-    await admin
-      .messaging()
-      .send(message)
-      .then(response => {
-        console.log('Successfully sent message:', response);
-      });
-  } catch (error) {
-    console.log('Error sending new trip message:', error);
-  }
+  await sendNewTripNotification();
 
   res.status(201).json({ result: tripRecord.toJSON() });
 };
 
 export const getAvailableTrip = async (
-  _req: AuthenticatedRequest,
+  req: AuthenticatedRequest,
   res: Response
 ) => {
-  const trip = await Trip.findOneAndUpdate(
-    {
-      status: { $eq: TripStatus.SERCHING_DRIVER },
-    },
-    { status: TripStatus.WAITING_DRIVER },
-    { new: true }
-  );
+  const { user } = req;
+
+  const trip = await getOneAvailableTrip(user!.uid);
   if (!trip) {
     return res.status(200).json({ result: null });
   }
@@ -87,107 +76,94 @@ export const getAvailableTrip = async (
 export const acceptTrip = async (req: AuthenticatedRequest, res: Response) => {
   const tripId = req.params.id;
   const { user } = req;
-  const trip = await Trip.findById(tripId);
-  if (!trip) {
-    return res.status(404).json({ error: ENDPOINT_ERRORS.tripNotFound });
-  }
-  const { error } = checkForAcceptStatus(trip);
-  if (error) {
-    return res.status(400).json({ error });
-  }
-  const updatedTrip = await Trip.findByIdAndUpdate(
-    trip.id,
-    {
-      driverId: user?.uid,
-      status: TripStatus.ACCEPTED,
-    },
-    { new: true }
-  );
-
-  const message = {
-    notification: {
-      title: 'Driver found',
-      body: 'A driver was found for your trip',
-    },
-    token: updatedTrip!.passengerDeviceId,
-  };
 
   try {
-    await admin
-      .messaging()
-      .send(message)
-      .then(response => {
-        console.log('Successfully sent message:', response);
-      });
-  } catch (errorSending) {
-    console.log('Error sending driver found message:', errorSending);
-  }
+    const updatedTrip = await acceptTripAndUpdate(tripId, user!.uid);
 
-  return res.status(200).json({ result: updatedTrip!.toJSON() });
+    await sendTripAcceptedNotification(updatedTrip!.passengerDeviceId);
+
+    return res.status(200).json({ result: updatedTrip!.toJSON() });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
 };
 
 export const rejectTrip = async (req: AuthenticatedRequest, res: Response) => {
   const tripId = req.params.id;
-  const trip = await Trip.findById(tripId);
-  if (!trip) {
-    return res.status(404).json({ error: ENDPOINT_ERRORS.tripNotFound });
+  const { user } = req;
+
+  try {
+    const updatedTrip = await rejectTripAndUpdate(tripId, user!.uid);
+
+    return res.status(200).json({ result: updatedTrip!.toJSON() });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
   }
-  const { error } = checkForAcceptStatus(trip);
-  if (error) {
-    return res.status(400).json({ error });
-  }
-  const updatedTrip = await Trip.findByIdAndUpdate(
-    trip.id,
-    {
-      status: TripStatus.SERCHING_DRIVER,
-    },
-    { new: true }
-  );
-  return res.status(200).json({ result: updatedTrip!.toJSON() });
 };
 
 export const startTrip = async (req: AuthenticatedRequest, res: Response) => {
   const tripId = req.params.id;
-  const trip = await Trip.findById(tripId);
-  if (!trip) {
-    return res.status(404).json({ error: ENDPOINT_ERRORS.tripNotFound });
+
+  try {
+    const updatedTrip = await startTripAndUpdate(tripId);
+
+    return res.status(200).json({ result: updatedTrip!.toJSON() });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
   }
-  const { error } = checkForStartStatus(trip);
-  if (error) {
-    return res.status(400).json({ error });
-  }
-  const updatedTrip = await Trip.findByIdAndUpdate(
-    trip.id,
-    {
-      status: TripStatus.STARTED,
-    },
-    { new: true }
-  );
-  return res.status(200).json({ result: updatedTrip!.toJSON() });
 };
 
 export const finishTrip = async (req: AuthenticatedRequest, res: Response) => {
   const tripId = req.params.id;
-  const trip = await Trip.findById(tripId);
-  if (!trip) {
-    return res.status(404).json({ error: ENDPOINT_ERRORS.tripNotFound });
-  }
-  const { error } = checkForFinishStatus(trip);
-  if (error) {
-    return res.status(400).json({ error });
-  }
-  const tx = await executePayment(trip.passengerId, trip.driverId, trip.cost);
-  if (!tx) {
-    return res.status(500).json({ error: ENDPOINT_ERRORS.paymentError });
-  }
+  const { user } = req;
 
-  const updatedTrip = await Trip.findByIdAndUpdate(
-    trip.id,
-    {
-      status: TripStatus.FINISHED,
-      paymentHash: tx.hash,
-    },
-    { new: true }
-  );
-  return res.status(200).json({ result: updatedTrip!.toJSON() });
+  try {
+    const updatedTrip = await finishTripAndUpdate(tripId, user!.uid);
+    const tx = await executePayment(
+      updatedTrip.passengerId,
+      updatedTrip.driverId,
+      updatedTrip.cost
+    );
+    if (!tx) {
+      return res.status(500).json({ error: ENDPOINT_ERRORS.paymentError });
+    }
+
+    const tripWithPayment = await updatePaymentHash(tripId, tx.hash);
+
+    return res.status(200).json({ result: tripWithPayment.toJSON() });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+export const cancelTrip = async (req: AuthenticatedRequest, res: Response) => {
+  const tripId = req.params.id;
+  const { user } = req;
+
+  try {
+    const updatedTrip = await cancelTripAndUpdate(tripId, user!.uid);
+
+    return res.status(200).json({ result: updatedTrip!.toJSON() });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
+};
+
+export const unfinishedTrip = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const { user } = req;
+
+  try {
+    const trip = await getUnfinishedTrip(user!.uid);
+
+    if (!trip) {
+      return res.status(200).json({ result: null });
+    }
+
+    return res.status(200).json({ result: trip.toJSON() });
+  } catch (error) {
+    return res.status(400).json({ error: error.message });
+  }
 };

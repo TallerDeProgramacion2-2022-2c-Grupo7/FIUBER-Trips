@@ -30,7 +30,7 @@ const generateTrip = () => {
 };
 
 describe('Test checkForAcceptStatus', () => {
-  let trip: ITrip;
+  let trip;
 
   beforeEach(() => {
     trip = generateTrip();
@@ -55,7 +55,7 @@ describe('Test checkForAcceptStatus', () => {
 });
 
 describe('Test checkForStartStatus', () => {
-  let trip: ITrip;
+  let trip;
 
   beforeEach(() => {
     trip = generateTrip();
@@ -80,7 +80,7 @@ describe('Test checkForStartStatus', () => {
 });
 
 describe('Test checkForFinishStatus', () => {
-  let trip: ITrip;
+  let trip;
 
   beforeEach(() => {
     trip = generateTrip();
@@ -105,7 +105,7 @@ describe('Test checkForFinishStatus', () => {
 });
 
 describe('Test checkForCanceledStatus', () => {
-  let trip: ITrip;
+  let trip;
 
   beforeEach(() => {
     trip = generateTrip();

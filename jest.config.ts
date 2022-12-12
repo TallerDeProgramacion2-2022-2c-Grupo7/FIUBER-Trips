@@ -6,7 +6,7 @@ const config: Config.InitialOptions = {
   transform: {
   '^.+\\.tsx?$': 'ts-jest',
   },
-  testPathIgnorePatterns: ['/node_modules/', '/dist/', 'utils.ts'],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/', 'utils.ts', '.*/__mocks__/'],
   collectCoverage: true,
   coverageReporters: ['html'],
   coveragePathIgnorePatterns: ['<rootDir>/src/jest/*', '.mock.ts', '.idl', '<rootDir>/src/utils/storage'],

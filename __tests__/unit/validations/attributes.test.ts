@@ -25,7 +25,7 @@ const generateTrip = () => {
 };
 
 describe('Test isDriver', () => {
-  let trip: ITrip;
+  let trip;
   const driverId = 'driverId';
   const otherDriverId = 'otherDriverId';
 
@@ -57,7 +57,7 @@ describe('Test isDriver', () => {
 });
 
 describe('Test isPassanger', () => {
-  let trip: ITrip;
+  let trip;
   const passengerId = 'passengerId';
   const otherPassengerId = 'otherPassengerId';
 

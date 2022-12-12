@@ -9,7 +9,7 @@ const datadogEvent = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (config.enviroment === 'development') {
+  if (config.enviroment !== 'production') {
     return next();
   }
   res.on('finish', function() {

@@ -1,13 +1,8 @@
 import * as admin from 'firebase-admin';
+import { DRIVER_FOUND, NEW_TRIP_AVAILABLE } from '../constants/notifications';
 
 export const sendNewTripNotification = async () => {
-  const message = {
-    notification: {
-      title: 'New trip available',
-      body: 'You have an available trip',
-    },
-    topic: 'availableTrips',
-  };
+  const message = NEW_TRIP_AVAILABLE;
 
   try {
     await admin
@@ -24,13 +19,7 @@ export const sendNewTripNotification = async () => {
 export const sendTripAcceptedNotification = async (
   passengerDeviceId: string
 ) => {
-  const message = {
-    notification: {
-      title: 'Driver found',
-      body: 'A driver was found for your trip',
-    },
-    token: passengerDeviceId,
-  };
+  const message = DRIVER_FOUND(passengerDeviceId);
 
   try {
     await admin

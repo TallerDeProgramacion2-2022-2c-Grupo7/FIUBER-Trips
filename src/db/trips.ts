@@ -32,6 +32,7 @@ const TripSchema = new Schema<ITrip>({
   from: MapPointSchema,
   to: MapPointSchema,
   cost: Number,
+  duration: Number,
   status: {
     type: String,
     enum: Object.values(TripStatus),
